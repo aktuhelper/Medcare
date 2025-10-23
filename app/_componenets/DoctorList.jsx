@@ -21,6 +21,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
                 ? `${STRAPI_BASE_URL}${doctor.Image[0].url}`
                 : "/default-doctor.jpg";
 
+                console.log(`Doctor ${index} imageUrl:`, imageUrl);
             return (
               <div
                 key={index}
