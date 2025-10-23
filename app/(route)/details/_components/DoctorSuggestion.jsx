@@ -3,7 +3,7 @@ import GlobalAPI from '@/app/_utils/GlobalAPI';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const STRAPI_BASE_URL = 'http://localhost:1337';
+const STRAPI_BASE_URL = 'https://medcare-appointment-admin.onrender.com';
 
 const DoctorSuggestion = () => {
   const [doctorList, setDoctorList] = useState([]);

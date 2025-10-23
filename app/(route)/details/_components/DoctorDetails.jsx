@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import DoctorSuggestion from './DoctorSuggestion';
 import BookAppointment from './BookAppointment';
 
-const STRAPI_BASE_URL = 'http://localhost:1337';
+const STRAPI_BASE_URL = 'https://medcare-appointment-admin.onrender.com';
 
 const DoctorDetails = ({ doctor }) => {
   const imageUrl = doctor?.Image?.[0]?.url

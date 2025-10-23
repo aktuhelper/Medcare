@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 
 const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
-  const STRAPI_BASE_URL = "http://localhost:1337"; // Change if deployed
+  const STRAPI_BASE_URL = "https://medcare-appointment-admin.onrender.com"; // Change if deployed
 
   return (
     <div className="mb-20 px-6 sm:px-10 lg:px-20">
