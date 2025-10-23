@@ -10,12 +10,13 @@ import Image from "next/image";
 import Link from "next/link"; // <-- Import Link
 
 const CategorySearch = () => {
+  const STRAPI_BASE_URL = "https://medcare-appointment-admin.onrender.com";
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const getCategoryList = async () => {
-      const STRAPI_BASE_URL = "https://medcare-appointment-admin.onrender.com";
+   
       try {
         const response = await GlobalAPI.getCategory();
         setCategoryList(response.data.data || []);
