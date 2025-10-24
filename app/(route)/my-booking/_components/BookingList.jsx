@@ -15,6 +15,31 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
     setBookings((prev) => prev.filter((b) => b.documentId !== documentId));
   };
 
+  // ✅ Helper to get a valid doctor image URL
+  const getDoctorImage = (item) => {
+    const img = item?.doctor?.Image?.[0]?.url || item?.Image?.[0]?.url;
+    if (!img) return "/default-icon.png";
+
+    let url = img;
+
+    // 1. Remove accidentally prepended backend domain
+    url = url.replace(/^https?:\/\/medcare-appointment-admin\.onrender\.com/, "");
+
+    // 2. Fix missing colon in https//
+    if (url.startsWith("https//")) url = url.replace(/^https\/\//, "https://");
+
+    // 3. If relative URL (from Strapi), prepend backend domain
+    if (url.startsWith("/uploads")) {
+      url = `https://medcare-appointment-admin.onrender.com${url}`;
+    }
+
+    // 4. If already a proper http(s) URL (Cloudinary), return as-is
+    if (url.startsWith("http")) return url;
+
+    // 5. Fallback
+    return "/default-icon.png";
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6 text-center">
@@ -25,16 +50,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
-
-            // ✅ Safely get doctor image (handle both array and nested object)
-            const doctorImage = (() => {
-              const img = item?.doctor?.Image?.[0]?.url || item?.Image?.[0]?.url;
-              if (!img) return "/default-icon.png";
-
-              // If it contains 'http' somewhere, make sure it starts with 'https://'
-              if (img.startsWith("http")) return img.replace(/^https*:/, "https:");
-              return `https://medcare-appointment-admin.onrender.com${img}`;
-            })();
+            const doctorImage = getDoctorImage(item);
 
             return (
               <div
@@ -49,7 +65,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                     width={100}
                     height={100}
                     className="rounded-full object-cover border border-gray-200"
-                    unoptimized // ✅ Optional: avoids Next.js optimization issues with Cloudinary
+                    unoptimized // avoids Next.js optimization issues with Cloudinary
                   />
                 </div>
 
