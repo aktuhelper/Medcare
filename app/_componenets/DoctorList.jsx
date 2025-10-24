@@ -20,7 +20,6 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
             ? item.Icon[0].url
             : "/default-icon.png";
 
-                console.log(`Doctor ${index} imageUrl:`, imageUrl);
             return (
               <div
                 key={index}
