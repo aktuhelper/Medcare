@@ -5,7 +5,7 @@ import Link from "next/link";
 import React from "react";
 
 const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
-  const STRAPI_BASE_URL = "https://medcare-appointment-admin.onrender.com"; // Change if deployed
+
 
   return (
     <div className="mb-20 px-6 sm:px-10 lg:px-20">
@@ -16,10 +16,9 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
       {doctors && doctors.length > 0 ? (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {doctors.map((doctor, index) => {
-            const imageUrl =
-              doctor?.Image?.[0]?.url
-                ? `${STRAPI_BASE_URL}${doctor.Image[0].url}`
-                : "/default-doctor.jpg";
+            const iconUrl = item?.Icon?.[0]?.url
+            ? item.Icon[0].url
+            : "/default-icon.png";
 
                 console.log(`Doctor ${index} imageUrl:`, imageUrl);
             return (

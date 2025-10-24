@@ -6,7 +6,6 @@ import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
-  const BASE_URL = 'http://localhost:1337'; // Your backend domain
 
   // Update local state when prop bookingList changes
   useEffect(() => {
@@ -29,23 +28,25 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
 
+            // Use Cloudinary URL from Strapi if available
+            const doctorImageUrl =
+              item?.doctor?.Image?.[0]?.url || '/default-icon.png';
+
             return (
               <div
                 key={item.documentId} // use documentId as key
                 className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4"
               >
                 {/* Doctor Image */}
-                {item?.doctor?.Image?.[0]?.url && (
-                  <div className="flex-shrink-0">
-                    <Image
-                      src={`${BASE_URL}${item.doctor.Image[0].url}`}
-                      alt={item.doctor.Name || 'Doctor'}
-                      width={100}
-                      height={100}
-                      className="rounded-full object-cover"
-                    />
-                  </div>
-                )}
+                <div className="flex-shrink-0">
+                  <Image
+                    src={doctorImageUrl}
+                    alt={item.doctor?.Name || 'Doctor'}
+                    width={100}
+                    height={100}
+                    className="rounded-full object-cover"
+                  />
+                </div>
 
                 {/* Doctor Info */}
                 <div className="flex-1 w-full text-center sm:text-left">

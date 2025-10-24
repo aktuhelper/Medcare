@@ -51,9 +51,8 @@ const CategoryList = () => {
               <div className="p-4 text-center text-gray-500">Loading...</div>
             ) : (
               categoryList.map((item, index) => {
-                const iconUrl = item?.Icon?.[0]?.url
-                  ? `${process.env.NEXT_PUBLIC_API_URL}${item.Icon[0].url}`
-                  : "/default-icon.png";
+                const iconUrl =  item?.doctor?.Image?.[0]?.url || '/default-icon.png';
+                
 
                 return (
                   <CommandItem key={index} className="w-full">
