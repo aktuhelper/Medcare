@@ -38,7 +38,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                 {item?.Image?.[0]?.url && (
                   <div className="flex-shrink-0">
                     <Image
-                      src={`${item.Image[0].url}`}
+                      src={item.Image[0].url}
                       alt={item.doctor.Name || 'Doctor'}
                       width={100}
                       height={100}
