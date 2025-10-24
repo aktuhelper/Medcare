@@ -6,28 +6,16 @@ import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
+  
 
+  // Update local state when prop bookingList changes
   useEffect(() => {
     setBookings(bookingList);
   }, [bookingList]);
 
+  // Handler to remove booking by documentId after cancellation
   const onDeleteBooking = (documentId) => {
     setBookings((prev) => prev.filter((b) => b.documentId !== documentId));
-  };
-
-  // Helper to safely get doctor image URL
-  const getDoctorImage = (item) => {
-    const img = item?.doctor?.Image?.[0]?.url || item?.Image?.[0]?.url;
-    if (!img) return '/default-icon.png';
-
-    // Fix https// typo
-    if (img.startsWith('https//')) return img.replace(/^https\/\//, 'https://');
-
-    // If it's already a full URL (Cloudinary), return as-is
-    if (/^https?:\/\//.test(img)) return img;
-
-    // Otherwise, treat as relative URL from backend
-    return `https://medcare-appointment-admin.onrender.com${img}`;
   };
 
   return (
@@ -43,44 +31,46 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
 
             return (
               <div
-                key={item.documentId}
+                key={item.documentId} // use documentId as key
                 className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4"
               >
                 {/* Doctor Image */}
-                <div className="flex-shrink-0">
-                  <Image
-                    src={getDoctorImage(item)}
-                    alt={item.doctor?.Name || 'Doctor'}
-                    width={100}
-                    height={100}
-                    className="rounded-full object-cover border border-gray-200"
-                    unoptimized
-                  />
-                </div>
+                {item?.Image?.[0]?.url && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={`${item.Image[0].url}`}
+                      alt={item.doctor.Name || 'Doctor'}
+                      width={100}
+                      height={100}
+                      className="rounded-full object-cover"
+                    />
+                  </div>
+                )}
 
                 {/* Doctor Info */}
                 <div className="flex-1 w-full text-center sm:text-left">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
                     <h3 className="text-xl font-semibold text-gray-800">
-                      {item.doctor?.Name || 'Unknown Doctor'}
+                      {item.doctor?.Name}
                     </h3>
 
+                    {/* Cancel Button (only for active bookings) */}
                     {!isExpired && (
                       <CancelAppointment
                         bookingId={item.documentId}
-                        onCancelSuccess={onDeleteBooking}
+                        onCancelSuccess={onDeleteBooking} // pass the handler directly
                       />
                     )}
                   </div>
 
                   <p className="text-gray-600">
-                    <span className="font-medium">Date:</span> {item.Date || 'N/A'}
+                    <span className="font-medium">Date:</span> {item.Date}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Time:</span> {item.Time || 'N/A'}
+                    <span className="font-medium">Time:</span> {item.Time}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Address:</span> {item.doctor?.Address || 'Not available'}
+                    <span className="font-medium">Address:</span> {item.doctor?.Address}
                   </p>
 
                   {isExpired && (
