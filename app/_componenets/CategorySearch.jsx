@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import GlobalAPI from "../_utils/GlobalAPI";
 import Image from "next/image";
 import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const CategorySearch = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -19,7 +20,7 @@ const CategorySearch = () => {
       try {
         const [categoryResponse, doctorResponse] = await Promise.all([
           GlobalAPI.getCategory(),
-          GlobalAPI.getDoctorList(), // should return data like you posted
+          GlobalAPI.getDoctorList(),
         ]);
 
         setCategoryList(categoryResponse.data.data || []);
@@ -33,7 +34,7 @@ const CategorySearch = () => {
     fetchData();
   }, []);
 
-  // 🔍 Filter doctors and categories
+  // 🔍 Filter logic
   const filteredDoctors = doctorList.filter(
     (doc) =>
       doc?.Name?.toLowerCase().includes(query.toLowerCase()) ||
@@ -44,13 +45,11 @@ const CategorySearch = () => {
     cat?.Name?.toLowerCase().includes(query.toLowerCase())
   );
 
-  const filteredResults = [
-    ...filteredDoctors.map((doc) => ({ type: "doctor", data: doc })),
-    ...filteredCategories.map((cat) => ({ type: "category", data: cat })),
-  ].slice(0, 6);
+  const hasSearch = query.trim().length > 0;
+  const showResults = hasSearch && (filteredDoctors.length > 0 || filteredCategories.length > 0);
 
   return (
-    <div className="flex flex-col items-center justify-center text-center my-12 px-4 relative">
+    <div className="mb-10 flex flex-col items-center justify-center text-center my-12 px-4 relative">
       {/* ---------- Heading ---------- */}
       <h2 className="font-bold text-4xl md:text-5xl tracking-wide mb-2">
         Search <span className="text-violet-600">Doctors</span>
@@ -65,7 +64,7 @@ const CategorySearch = () => {
           <Search className="text-gray-400 w-5 h-5" />
           <Input
             type="text"
-            placeholder="Search by doctor or category..."
+            placeholder="Search by doctor, specialty or category..."
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -79,71 +78,123 @@ const CategorySearch = () => {
 
         {/* ---------- Dropdown Results ---------- */}
         {showDropdown && (
-          <div className="absolute top-14 left-0 w-full bg-white shadow-lg rounded-xl border border-gray-100 overflow-hidden z-50 text-left">
+          <div className="absolute top-14 left-0 w-full bg-white shadow-lg rounded-xl border border-gray-100 overflow-hidden z-50 text-left max-h-[350px] overflow-y-auto">
             {loading ? (
               <p className="p-4 text-gray-500 text-sm">Loading...</p>
-            ) : filteredResults.length > 0 ? (
-              <ul className="divide-y divide-gray-100">
-                {filteredResults.map((item, idx) => {
-                  if (item.type === "doctor") {
-                    const doc = item.data;
-                    const imageUrl =
-                      doc?.Image?.[0]?.url || "/default-doctor.png";
-                    return (
-                      <Link
-                        key={idx}
-                        href={`/doctor/${doc.documentId}`}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <Image
-                          src={imageUrl}
-                          alt={doc.Name}
-                          width={45}
-                          height={45}
-                          className="rounded-full object-cover"
-                        />
-                        <div className="flex flex-col">
-                          <p className="text-gray-800 font-medium">
-                            {doc.Name}
-                          </p>
-                          <p className="text-gray-500 text-sm">
-                            {doc.categories?.Name || "General"} •{" "}
-                            {doc.Experience || ""}
-                          </p>
-                          <p className="text-gray-400 text-xs truncate max-w-[250px]">
-                            {doc.Address}
-                          </p>
-                        </div>
-                      </Link>
-                    );
-                  } else {
-                    const cat = item.data;
-                    const iconUrl =
-                      cat?.Icon?.[0]?.url || "/default-icon.png";
-                    return (
-                      <Link
-                        key={idx}
-                        href={`/search/${cat.Name}`}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
-                      >
-                        <Image
-                          src={iconUrl}
-                          alt={cat.Name}
-                          width={35}
-                          height={35}
-                          className="object-contain rounded-full bg-gray-50"
-                        />
-                        <p className="text-gray-800 font-medium">
-                          {cat.Name}
-                        </p>
-                      </Link>
-                    );
-                  }
-                })}
-              </ul>
+            ) : showResults ? (
+              <>
+                {/* Doctors Section */}
+                {filteredDoctors.length > 0 && (
+                  <>
+                    <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Doctors
+                    </p>
+                    <ul className="divide-y divide-gray-100">
+                      {filteredDoctors.map((doc, idx) => {
+                        const imageUrl =
+                          doc?.Image?.[0]?.url || "/default-doctor.png";
+                        return (
+                          <Link
+                            key={idx}
+                            href={`/doctor/${doc.documentId}`}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                          >
+                            <Image
+                              src={imageUrl}
+                              alt={doc.Name}
+                              width={40}
+                              height={40}
+                              className="rounded-full object-cover"
+                            />
+                            <div className="flex flex-col">
+                              <p className="text-gray-800 font-medium">{doc.Name}</p>
+                              <p className="text-gray-500 text-sm">
+                                {doc.categories?.Name || "General"} • {doc.Experience || ""}
+                              </p>
+                              <p className="text-gray-400 text-xs truncate max-w-[250px]">
+                                {doc.Address}
+                              </p>
+                            </div>
+                          </Link>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+
+                {/* Categories Section */}
+                {filteredCategories.length > 0 && (
+                  <>
+                    <p className="px-4 pt-3 pb-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                      Categories
+                    </p>
+                    <ul className="divide-y divide-gray-100">
+                      {filteredCategories.map((cat, idx) => {
+                        const iconUrl = cat?.Icon?.[0]?.url || "/default-icon.png";
+                        return (
+                          <Link
+                            key={idx}
+                            href={`/search/${cat.Name}`}
+                            className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                          >
+                            <Image
+                              src={iconUrl}
+                              alt={cat.Name}
+                              width={35}
+                              height={35}
+                              className="object-contain rounded-full bg-gray-50"
+                            />
+                            <p className="text-gray-800 font-medium">{cat.Name}</p>
+                          </Link>
+                        );
+                      })}
+                    </ul>
+                  </>
+                )}
+              </>
             ) : (
               <p className="p-4 text-gray-500 text-sm">No results found</p>
             )}
+          </div>
+        )}
+      </div>
+
+      {/* ---------- Category Grid Below ---------- */}
+      <div className="mt-16 flex justify-center w-full">
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div
+                key={index}
+                className="flex flex-col text-center items-center p-5 bg-blue-50 rounded-lg shadow-sm border border-gray-100"
+              >
+                <Skeleton className="h-[60px] w-[60px] rounded-full mb-3 animate-pulse" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center">
+            {categoryList.slice(0, 6).map((item, index) => {
+              const iconUrl = item?.Icon?.[0]?.url || "/default-icon.png";
+              const name = item?.Name || "Unknown";
+              return (
+                <Link
+                  key={index}
+                  href={`/search/${name}`}
+                  className="flex flex-col text-center items-center p-5 bg-blue-50 cursor-pointer rounded-lg shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
+                >
+                  <Image
+                    src={iconUrl}
+                    alt={name}
+                    width={60}
+                    height={60}
+                    className="object-contain mb-2"
+                  />
+                  <p className="text-gray-700 font-medium">{name}</p>
+                </Link>
+              );
+            })}
           </div>
         )}
       </div>
