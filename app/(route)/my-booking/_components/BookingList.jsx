@@ -1,12 +1,10 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import GlobalAPI from '@/app/_utils/GlobalAPI'; // API helper
 import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
-  
 
   // Update local state when prop bookingList changes
   useEffect(() => {
@@ -16,6 +14,14 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   // Handler to remove booking by documentId after cancellation
   const onDeleteBooking = (documentId) => {
     setBookings((prev) => prev.filter((b) => b.documentId !== documentId));
+  };
+
+  // Helper for safe image URLs
+  const getSafeImageUrl = (image) => {
+    if (!image?.url) return '/placeholder-doctor.png'; // fallback image
+    return image.url.startsWith('http')
+      ? image.url
+      : `https://medcare-appointment-admin.onrender.com${image.url}`;
   };
 
   return (
@@ -31,15 +37,15 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
 
             return (
               <div
-                key={item.documentId} // use documentId as key
+                key={item.documentId}
                 className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4"
               >
                 {/* Doctor Image */}
                 {item?.Image?.[0]?.url && (
                   <div className="flex-shrink-0">
                     <Image
-                      src={item.Image[0].url}
-                      alt={item.doctor.Name || 'Doctor'}
+                      src={getSafeImageUrl(item.Image[0])}
+                      alt={item.doctor?.Name || 'Doctor'}
                       width={100}
                       height={100}
                       className="rounded-full object-cover"
@@ -58,7 +64,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                     {!isExpired && (
                       <CancelAppointment
                         bookingId={item.documentId}
-                        onCancelSuccess={onDeleteBooking} // pass the handler directly
+                        onCancelSuccess={onDeleteBooking}
                       />
                     )}
                   </div>
