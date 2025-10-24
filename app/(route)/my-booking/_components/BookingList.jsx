@@ -1,18 +1,16 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import React, { useState, useEffect } from "react";
-import GlobalAPI from "@/app/_utils/GlobalAPI"; // API helper
+import GlobalAPI from "@/app/_utils/GlobalAPI";
 import CancelAppointment from "./CancelAppointment";
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
 
-  // Update local state when prop bookingList changes
   useEffect(() => {
     setBookings(bookingList);
   }, [bookingList]);
 
-  // Handler to remove booking by documentId after cancellation
   const onDeleteBooking = (documentId) => {
     setBookings((prev) => prev.filter((b) => b.documentId !== documentId));
   };
@@ -28,10 +26,12 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
 
-            // ✅ Safely get doctor image (Cloudinary or fallback)
+            // ✅ Safely get doctor image (handle both array and nested object)
             const doctorImage =
-              item?.Image?.[0]?.url || "/default-icon.png";
-console.log('doctorImage:', doctorImage);
+              item?.doctor?.Image?.[0]?.url || // If nested under doctor
+              item?.Image?.[0]?.url ||          // If in booking directly
+              "/default-icon.png";               // Fallback
+
             return (
               <div
                 key={item.documentId}
@@ -45,6 +45,7 @@ console.log('doctorImage:', doctorImage);
                     width={100}
                     height={100}
                     className="rounded-full object-cover border border-gray-200"
+                    unoptimized // ✅ Optional: avoids Next.js optimization issues with Cloudinary
                   />
                 </div>
 
@@ -55,7 +56,6 @@ console.log('doctorImage:', doctorImage);
                       {item.doctor?.Name || "Unknown Doctor"}
                     </h3>
 
-                    {/* Cancel Button (only for active bookings) */}
                     {!isExpired && (
                       <CancelAppointment
                         bookingId={item.documentId}
