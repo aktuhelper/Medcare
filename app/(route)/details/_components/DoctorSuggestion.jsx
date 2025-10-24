@@ -3,7 +3,6 @@ import GlobalAPI from '@/app/_utils/GlobalAPI';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const STRAPI_BASE_URL = 'https://medcare-appointment-admin.onrender.com';
 
 const DoctorSuggestion = () => {
   const [doctorList, setDoctorList] = useState([]);
@@ -31,7 +30,7 @@ const DoctorSuggestion = () => {
         <ul className="space-y-4">
           {doctorList.slice(0, 4).map((doctor) => {
             const imageUrl = doctor?.Image?.[0]?.url
-              ? `${STRAPI_BASE_URL}${doctor.Image[0].url}`
+              ? `${doctor.Image[0].url}`
               : '/default-doctor.jpg';
 
             return (

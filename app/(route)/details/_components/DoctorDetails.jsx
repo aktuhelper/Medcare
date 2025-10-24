@@ -6,11 +6,11 @@ import { Button } from '@/components/ui/button';
 import DoctorSuggestion from './DoctorSuggestion';
 import BookAppointment from './BookAppointment';
 
-const STRAPI_BASE_URL = 'https://medcare-appointment-admin.onrender.com';
+
 
 const DoctorDetails = ({ doctor }) => {
   const imageUrl = doctor?.Image?.[0]?.url
-    ? `${STRAPI_BASE_URL}${doctor.Image[0].url}`
+    ? `${doctor.Image[0].url}`
     : '/default-doctor.jpg';
 
   const socialLinks = {

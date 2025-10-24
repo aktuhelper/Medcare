@@ -4,7 +4,7 @@ const axiosClient = axios.create({
   baseURL: "https://medcare-appointment-admin.onrender.com/api",
   headers: {
     Authorization: `Bearer ${ API_KEY }`,
-  },
+  },y
 });
 const getCategory = () => {
   return axiosClient.get("/categories?populate=*"); //populated all categories
