@@ -10,7 +10,7 @@ import Image from "next/image";
 import Link from "next/link"; // <-- Import Link
 
 const CategorySearch = () => {
-  const STRAPI_BASE_URL = "https://medcare-appointment-admin.onrender.com";
+ 
   const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -69,9 +69,10 @@ const CategorySearch = () => {
                 </div>
               ))
             : categoryList.slice(0, 6).map((item, index) => {
-                const iconUrl = item?.Icon?.[0]?.url
-                  ? `${STRAPI_BASE_URL }${item.Icon[0].url}`
-                  : "/default-icon.png";
+              const iconUrl = item?.Icon?.[0]?.url
+              ? item.Icon[0].url
+              : "/default-icon.png";
+            
 
                 const name = item?.Name || "Unknown";
 
