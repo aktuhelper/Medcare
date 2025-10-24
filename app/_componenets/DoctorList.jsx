@@ -16,7 +16,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
       {doctors && doctors.length > 0 ? (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {doctors.map((doctor, index) => {
-            const iconUrl = item?.Icon?.[0]?.url
+            const iconUrl = doctor?.Icon?.[0]?.url
             ? item.Icon[0].url
             : "/default-icon.png";
 
@@ -29,7 +29,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
                 {/* Circular Image */}
                 <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-blue-100 shadow-sm relative">
                   <Image
-                    src={imageUrl}
+                    src={iconUrl}
                     alt={doctor?.Name || "Doctor"}
                     fill
                     className="object-cover"
