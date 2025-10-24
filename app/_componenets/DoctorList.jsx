@@ -17,7 +17,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {doctors.map((doctor, index) => {
             const iconUrl = doctor?.Icon?.[0]?.url
-            ? item.Icon[0].url
+            ? doctor.Icon[0].url
             : "/default-icon.png";
 
             return (
