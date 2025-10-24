@@ -27,10 +27,14 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
 
             // ✅ Safely get doctor image (handle both array and nested object)
-            const doctorImage =
-              item?.doctor?.Image?.[0]?.url || // If nested under doctor
-              item?.Image?.[0]?.url ||          // If in booking directly
-              "/default-icon.png";               // Fallback
+            const doctorImage = (() => {
+              const img = item?.doctor?.Image?.[0]?.url || item?.Image?.[0]?.url;
+              if (!img) return "/default-icon.png";
+
+              // If it contains 'http' somewhere, make sure it starts with 'https://'
+              if (img.startsWith("http")) return img.replace(/^https*:/, "https:");
+              return `https://medcare-appointment-admin.onrender.com${img}`;
+            })();
 
             return (
               <div
