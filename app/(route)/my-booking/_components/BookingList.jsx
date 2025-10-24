@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import GlobalAPI from '@/app/_utils/GlobalAPI'; // API helper
+import GlobalAPI from '@/app/_utils/GlobalAPI';
 import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
@@ -28,13 +28,13 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
 
-            // Use Cloudinary URL from Strapi if available
+            // Cloudinary URL from Strapi with fallback
             const doctorImageUrl =
               item?.doctor?.Image?.[0]?.url || '/default-icon.png';
 
             return (
               <div
-                key={item.documentId} // use documentId as key
+                key={item.documentId}
                 className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4"
               >
                 {/* Doctor Image */}
@@ -55,11 +55,10 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                       {item.doctor?.Name}
                     </h3>
 
-                    {/* Cancel Button (only for active bookings) */}
                     {!isExpired && (
                       <CancelAppointment
                         bookingId={item.documentId}
-                        onCancelSuccess={onDeleteBooking} // pass the handler directly
+                        onCancelSuccess={onDeleteBooking}
                       />
                     )}
                   </div>
@@ -71,7 +70,8 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                     <span className="font-medium">Time:</span> {item.Time}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Address:</span> {item.doctor?.Address}
+                    <span className="font-medium">Address:</span>{' '}
+                    {item.doctor?.Address}
                   </p>
 
                   {isExpired && (
