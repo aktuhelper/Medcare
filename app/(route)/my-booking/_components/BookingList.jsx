@@ -30,7 +30,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
 
             // ✅ Safely get doctor image (Cloudinary or fallback)
             const doctorImage =
-              item?.doctor?.Image?.[0]?.url || "/default-icon.png";
+              item?.Image?.[0]?.url || "/default-icon.png";
 console.log('doctorImage:', doctorImage);
             return (
               <div
