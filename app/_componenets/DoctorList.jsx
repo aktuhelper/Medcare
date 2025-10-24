@@ -19,6 +19,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
             const iconUrl =
               doctor?.Icon?.[0]?.url ||
               "https://cdn-icons-png.flaticon.com/512/3774/3774299.png";
+            console.log("Doctor image URL:", doctor?.Icon?.[0]?.url);
 
 
             return (
