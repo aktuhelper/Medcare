@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import GlobalAPI from '@/app/_utils/GlobalAPI';
+import GlobalAPI from '@/app/_utils/GlobalAPI'; // API helper
 import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
+  const BASE_URL = 'http://localhost:1337'; // Your backend domain
 
   // Update local state when prop bookingList changes
   useEffect(() => {
@@ -28,25 +29,23 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
 
-            // Cloudinary URL from Strapi with fallback
-            const doctorImageUrl =
-              item?.doctor?.Image?.[0]?.url || '/default-icon.png';
-
             return (
               <div
-                key={item.documentId}
+                key={item.documentId} // use documentId as key
                 className="bg-white shadow-md rounded-lg p-6 flex flex-col sm:flex-row items-center sm:items-start gap-4"
               >
                 {/* Doctor Image */}
-                <div className="flex-shrink-0">
-                  <Image
-                    src={doctorImageUrl}
-                    alt={item.doctor?.Name || 'Doctor'}
-                    width={100}
-                    height={100}
-                    className="rounded-full object-cover"
-                  />
-                </div>
+                {item?.doctor?.Image?.[0]?.url && (
+                  <div className="flex-shrink-0">
+                    <Image
+                      src={`${BASE_URL}${item.doctor.Image[0].url}`}
+                      alt={item.doctor.Name || 'Doctor'}
+                      width={100}
+                      height={100}
+                      className="rounded-full object-cover"
+                    />
+                  </div>
+                )}
 
                 {/* Doctor Info */}
                 <div className="flex-1 w-full text-center sm:text-left">
@@ -55,10 +54,11 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                       {item.doctor?.Name}
                     </h3>
 
+                    {/* Cancel Button (only for active bookings) */}
                     {!isExpired && (
                       <CancelAppointment
                         bookingId={item.documentId}
-                        onCancelSuccess={onDeleteBooking}
+                        onCancelSuccess={onDeleteBooking} // pass the handler directly
                       />
                     )}
                   </div>
@@ -70,8 +70,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                     <span className="font-medium">Time:</span> {item.Time}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Address:</span>{' '}
-                    {item.doctor?.Address}
+                    <span className="font-medium">Address:</span> {item.doctor?.Address}
                   </p>
 
                   {isExpired && (
