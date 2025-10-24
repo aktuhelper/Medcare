@@ -33,7 +33,7 @@ const CategoryList = () => {
       }
     };
     getCategoryList();
-  }, []);
+  }, [category]);
 
   return (
     <div className="h-screen mt-5 flex flex-col scrollbar-hide w-full max-w-xs bg-white shadow-lg rounded-xl">
@@ -51,8 +51,8 @@ const CategoryList = () => {
               <div className="p-4 text-center text-gray-500">Loading...</div>
             ) : (
               categoryList.map((item, index) => {
-                const iconUrl =  item?.doctor?.Image?.[0]?.url || '/default-icon.png';
-                
+                const iconUrl =
+                  item?.Icon?.[0]?.url || "/default-icon.png"; // <-- fix here
 
                 return (
                   <CommandItem key={index} className="w-full">
