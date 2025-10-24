@@ -19,7 +19,7 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
             const iconUrl =
               doctor?.Image?.[0]?.url || "/default-icon.png";
 
-            console.log("Doctor image URL:", doctor?.Icon?.[0]?.url);
+            
 
 
             return (
