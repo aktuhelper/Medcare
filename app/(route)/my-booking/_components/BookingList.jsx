@@ -20,11 +20,15 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
 
   // Helper for safe image URLs
   const getSafeImageUrl = (image) => {
-    if (!image?.url) return '/placeholder-doctor.png'; // fallback image
-    return image.url.startsWith('http')
-      ? image.url
-      : `https://medcare-appointment-admin.onrender.com${image.url}`;
+    if (!image?.url) return '/placeholder-doctor.png';
+    // Only prepend backend if the URL starts with a single slash
+    if (image.url.startsWith('/')) {
+      return `https://medcare-appointment-admin.onrender.com${image.url}`;
+    }
+    // Otherwise use as-is
+    return image.url;
   };
+
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
