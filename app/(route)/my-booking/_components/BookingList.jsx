@@ -49,6 +49,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
+            console.log("Doctor image URL:", item.Image?.[0]?.url);
 
             return (
               <div
