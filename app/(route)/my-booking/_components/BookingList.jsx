@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import React, { useState, useEffect } from "react";
-import GlobalAPI from "@/app/_utils/GlobalAPI";
-import CancelAppointment from "./CancelAppointment";
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import React, { useState, useEffect } from 'react';
+import GlobalAPI from '@/app/_utils/GlobalAPI'; // API helper
+import CancelAppointment from './CancelAppointment';
 
 const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
   const [bookings, setBookings] = useState(bookingList);
@@ -15,42 +15,31 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
     setBookings((prev) => prev.filter((b) => b.documentId !== documentId));
   };
 
-  // ✅ Helper to get a valid doctor image URL
+  // Helper to safely get doctor image URL
   const getDoctorImage = (item) => {
     const img = item?.doctor?.Image?.[0]?.url || item?.Image?.[0]?.url;
-    if (!img) return "/default-icon.png";
+    if (!img) return '/default-icon.png';
 
-    let url = img;
+    // Fix https// typo
+    if (img.startsWith('https//')) return img.replace(/^https\/\//, 'https://');
 
-    // 1. Remove accidentally prepended backend domain
-    url = url.replace(/^https?:\/\/medcare-appointment-admin\.onrender\.com/, "");
+    // If it's already a full URL (Cloudinary), return as-is
+    if (/^https?:\/\//.test(img)) return img;
 
-    // 2. Fix missing colon in https//
-    if (url.startsWith("https//")) url = url.replace(/^https\/\//, "https://");
-
-    // 3. If relative URL (from Strapi), prepend backend domain
-    if (url.startsWith("/uploads")) {
-      url = `https://medcare-appointment-admin.onrender.com${url}`;
-    }
-
-    // 4. If already a proper http(s) URL (Cloudinary), return as-is
-    if (url.startsWith("http")) return url;
-
-    // 5. Fallback
-    return "/default-icon.png";
+    // Otherwise, treat as relative URL from backend
+    return `https://medcare-appointment-admin.onrender.com${img}`;
   };
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h2 className="text-2xl font-bold mb-6 text-center">
-        {isExpiredTab ? "Expired Bookings" : "Your Bookings"}
+        {isExpiredTab ? 'Expired Bookings' : 'Your Bookings'}
       </h2>
 
       {bookings.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {bookings.map((item) => {
             const isExpired = Boolean(item?.expired) || isExpiredTab;
-            const doctorImage = getDoctorImage(item);
 
             return (
               <div
@@ -60,12 +49,12 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                 {/* Doctor Image */}
                 <div className="flex-shrink-0">
                   <Image
-                    src={doctorImage}
-                    alt={item.doctor?.Name || "Doctor"}
+                    src={getDoctorImage(item)}
+                    alt={item.doctor?.Name || 'Doctor'}
                     width={100}
                     height={100}
                     className="rounded-full object-cover border border-gray-200"
-                    unoptimized // avoids Next.js optimization issues with Cloudinary
+                    unoptimized
                   />
                 </div>
 
@@ -73,7 +62,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                 <div className="flex-1 w-full text-center sm:text-left">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 mb-2">
                     <h3 className="text-xl font-semibold text-gray-800">
-                      {item.doctor?.Name || "Unknown Doctor"}
+                      {item.doctor?.Name || 'Unknown Doctor'}
                     </h3>
 
                     {!isExpired && (
@@ -85,14 +74,13 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
                   </div>
 
                   <p className="text-gray-600">
-                    <span className="font-medium">Date:</span> {item?.Date || "N/A"}
+                    <span className="font-medium">Date:</span> {item.Date || 'N/A'}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Time:</span> {item?.Time || "N/A"}
+                    <span className="font-medium">Time:</span> {item.Time || 'N/A'}
                   </p>
                   <p className="text-gray-600">
-                    <span className="font-medium">Address:</span>{" "}
-                    {item.doctor?.Address || "Not available"}
+                    <span className="font-medium">Address:</span> {item.doctor?.Address || 'Not available'}
                   </p>
 
                   {isExpired && (
@@ -105,9 +93,7 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
         </div>
       ) : (
         <p className="text-center text-gray-500">
-          {isExpiredTab
-            ? "No expired bookings found."
-            : "No bookings found."}
+          {isExpiredTab ? 'No expired bookings found.' : 'No bookings found.'}
         </p>
       )}
     </div>
