@@ -16,9 +16,10 @@ const DoctorList = ({ doctors, heading = "Popular Doctors" }) => {
       {doctors && doctors.length > 0 ? (
         <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {doctors.map((doctor, index) => {
-            const iconUrl = doctor?.Icon?.[0]?.url
-            ? doctor.Icon[0].url
-            : "/default-icon.png";
+            const iconUrl =
+              doctor?.Icon?.[0]?.url ||
+              "https://cdn-icons-png.flaticon.com/512/3774/3774299.png";
+
 
             return (
               <div
