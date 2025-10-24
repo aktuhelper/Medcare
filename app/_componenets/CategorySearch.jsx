@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import GlobalAPI from "../_utils/GlobalAPI";
@@ -11,16 +9,17 @@ import Link from "next/link";
 
 const CategorySearch = () => {
   const [categoryList, setCategoryList] = useState([]);
-  const [doctorList, setDoctorList] = useState([]); // <-- NEW
+  const [doctorList, setDoctorList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const [categoryResponse, doctorResponse] = await Promise.all([
           GlobalAPI.getCategory(),
-          GlobalAPI.getDoctorList(), // <-- create this API call
+          GlobalAPI.getDoctorList(), // should return data like you posted
         ]);
 
         setCategoryList(categoryResponse.data.data || []);
@@ -34,21 +33,24 @@ const CategorySearch = () => {
     fetchData();
   }, []);
 
-  // 🔍 Filter categories and doctors
-  const filteredCategories = categoryList.filter((item) =>
-    item?.Name?.toLowerCase().includes(query.toLowerCase())
-  );
-
+  // 🔍 Filter doctors and categories
   const filteredDoctors = doctorList.filter(
     (doc) =>
       doc?.Name?.toLowerCase().includes(query.toLowerCase()) ||
-      doc?.Specialty?.toLowerCase().includes(query.toLowerCase())
+      doc?.categories?.Name?.toLowerCase().includes(query.toLowerCase())
   );
 
-  const hasSearch = query.trim().length > 0;
+  const filteredCategories = categoryList.filter((cat) =>
+    cat?.Name?.toLowerCase().includes(query.toLowerCase())
+  );
+
+  const filteredResults = [
+    ...filteredDoctors.map((doc) => ({ type: "doctor", data: doc })),
+    ...filteredCategories.map((cat) => ({ type: "category", data: cat })),
+  ].slice(0, 6);
 
   return (
-    <div className="mb-10 flex flex-col items-center justify-center text-center my-12 px-4">
+    <div className="flex flex-col items-center justify-center text-center my-12 px-4 relative">
       {/* ---------- Heading ---------- */}
       <h2 className="font-bold text-4xl md:text-5xl tracking-wide mb-2">
         Search <span className="text-violet-600">Doctors</span>
@@ -58,118 +60,90 @@ const CategorySearch = () => {
       </p>
 
       {/* ---------- Search Bar ---------- */}
-      <div className="flex w-full max-w-md items-center gap-2 bg-white shadow-md rounded-full px-4 py-2 border border-gray-200">
-        <Search className="text-gray-500 w-5 h-5" />
-        <Input
-          type="text"
-          placeholder="Search by doctor, specialty or category"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="border-none focus-visible:ring-0 focus:outline-none text-gray-700 placeholder-gray-400"
-        />
-        <Button
-          type="button"
-          className="rounded-full bg-violet-600 hover:bg-violet-700 text-white px-6"
-        >
-          Search
-        </Button>
-      </div>
+      <div className="relative w-full max-w-xl">
+        <div className="flex items-center gap-2 bg-white shadow-md rounded-full px-4 py-2 border border-gray-200 focus-within:border-violet-500 transition-all duration-200">
+          <Search className="text-gray-400 w-5 h-5" />
+          <Input
+            type="text"
+            placeholder="Search by doctor or category..."
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setShowDropdown(e.target.value.trim().length > 0);
+            }}
+            onFocus={() => query && setShowDropdown(true)}
+            onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
+            className="flex-1 border-none focus-visible:ring-0 focus:outline-none text-gray-700 placeholder-gray-400"
+          />
+        </div>
 
-      {/* ---------- Results ---------- */}
-      <div className="mt-12 flex justify-center w-full">
-        {loading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center">
-            {Array.from({ length: 6 }).map((_, index) => (
-              <div
-                key={index}
-                className="flex flex-col text-center items-center p-5 bg-blue-50 rounded-lg shadow-sm border border-gray-100"
-              >
-                <Skeleton className="h-[60px] w-[60px] rounded-full mb-3 animate-pulse" />
-                <Skeleton className="h-4 w-24" />
-              </div>
-            ))}
-          </div>
-        ) : hasSearch ? (
-          <>
-            {/* ---------- Doctor Results ---------- */}
-            {filteredDoctors.length > 0 && (
-              <div className="mb-10 w-full">
-                <h3 className="text-2xl font-semibold mb-4 text-left">Doctors</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
-                  {filteredDoctors.map((doc, index) => (
-                    <Link
-                      key={index}
-                      href={`/doctor/${doc.id}`}
-                      className="flex flex-col text-center items-center p-5 bg-green-50 rounded-lg shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
-                    >
-                      <Image
-                        src={doc?.ProfileImage?.url || "/default-doctor.png"}
-                        alt={doc?.Name || "Doctor"}
-                        width={60}
-                        height={60}
-                        className="object-cover rounded-full mb-2"
-                      />
-                      <p className="font-medium text-gray-800">{doc?.Name}</p>
-                      <p className="text-gray-500 text-sm">{doc?.Specialty}</p>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* ---------- Category Results ---------- */}
-            {filteredCategories.length > 0 && (
-              <div className="w-full">
-                <h3 className="text-2xl font-semibold mb-4 text-left">Categories</h3>
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8">
-                  {filteredCategories.map((item, index) => {
-                    const iconUrl = item?.Icon?.[0]?.url || "/default-icon.png";
-                    const name = item?.Name || "Unknown";
-
+        {/* ---------- Dropdown Results ---------- */}
+        {showDropdown && (
+          <div className="absolute top-14 left-0 w-full bg-white shadow-lg rounded-xl border border-gray-100 overflow-hidden z-50 text-left">
+            {loading ? (
+              <p className="p-4 text-gray-500 text-sm">Loading...</p>
+            ) : filteredResults.length > 0 ? (
+              <ul className="divide-y divide-gray-100">
+                {filteredResults.map((item, idx) => {
+                  if (item.type === "doctor") {
+                    const doc = item.data;
+                    const imageUrl =
+                      doc?.Image?.[0]?.url || "/default-doctor.png";
                     return (
                       <Link
-                        key={index}
-                        href={`/search/${name}`}
-                        className="flex flex-col text-center items-center p-5 bg-blue-50 rounded-lg shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
+                        key={idx}
+                        href={`/doctor/${doc.documentId}`}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
+                      >
+                        <Image
+                          src={imageUrl}
+                          alt={doc.Name}
+                          width={45}
+                          height={45}
+                          className="rounded-full object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <p className="text-gray-800 font-medium">
+                            {doc.Name}
+                          </p>
+                          <p className="text-gray-500 text-sm">
+                            {doc.categories?.Name || "General"} •{" "}
+                            {doc.Experience || ""}
+                          </p>
+                          <p className="text-gray-400 text-xs truncate max-w-[250px]">
+                            {doc.Address}
+                          </p>
+                        </div>
+                      </Link>
+                    );
+                  } else {
+                    const cat = item.data;
+                    const iconUrl =
+                      cat?.Icon?.[0]?.url || "/default-icon.png";
+                    return (
+                      <Link
+                        key={idx}
+                        href={`/search/${cat.Name}`}
+                        className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors"
                       >
                         <Image
                           src={iconUrl}
-                          alt={name}
-                          width={60}
-                          height={60}
-                          className="object-contain mb-2"
+                          alt={cat.Name}
+                          width={35}
+                          height={35}
+                          className="object-contain rounded-full bg-gray-50"
                         />
-                        <p className="text-gray-700 font-medium">{name}</p>
+                        <p className="text-gray-800 font-medium">
+                          {cat.Name}
+                        </p>
                       </Link>
                     );
-                  })}
-                </div>
-              </div>
+                  }
+                })}
+              </ul>
+            ) : (
+              <p className="p-4 text-gray-500 text-sm">No results found</p>
             )}
-          </>
-        ) : (
-          // Default categories (when no search)
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center">
-            {categoryList.slice(0, 6).map((item, index) => {
-              const iconUrl = item?.Icon?.[0]?.url || "/default-icon.png";
-              const name = item?.Name || "Unknown";
-              return (
-                <Link
-                  key={index}
-                  href={`/search/${name}`}
-                  className="flex flex-col text-center items-center p-5 bg-blue-50 rounded-lg shadow hover:shadow-lg hover:scale-105 transition-all duration-200"
-                >
-                  <Image
-                    src={iconUrl}
-                    alt={name}
-                    width={60}
-                    height={60}
-                    className="object-contain mb-2"
-                  />
-                  <p className="text-gray-700 font-medium">{name}</p>
-                </Link>
-              );
-            })}
           </div>
         )}
       </div>
