@@ -69,7 +69,7 @@ const CategorySearch = () => {
               ))
             : categoryList.slice(0, 6).map((item, index) => {
                 const iconUrl = item?.Icon?.[0]?.url
-                  ? `${STRAPI_BASE_URL }${item.Icon[0].url}`
+                  ? `${item.Icon[0].url}`
                   : "/default-icon.png";
 
                 const name = item?.Name || "Unknown";
