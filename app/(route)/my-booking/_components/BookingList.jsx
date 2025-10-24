@@ -18,11 +18,26 @@ const BookingList = ({ bookingList = [], isExpiredTab = false }) => {
 
   // Helper for safe image URLs
   const getSafeImageUrl = (image) => {
-    if (!image?.url) return '/placeholder-doctor.png'; // fallback image
+    if (!image?.url) return '/placeholder-doctor.png'; // fallback
     return image.url.startsWith('http')
       ? image.url
       : `https://medcare-appointment-admin.onrender.com${image.url}`;
   };
+
+  // Inside the .map() for bookings:
+  {
+    item?.Image?.[0] && (
+      <div className="flex-shrink-0">
+        <Image
+          src={getSafeImageUrl(item.Image[0])}
+          alt={item.doctor?.Name || 'Doctor'}
+          width={100}
+          height={100}
+          className="rounded-full object-cover"
+        />
+      </div>
+    )
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
